@@ -15,7 +15,6 @@ module.exports = {
     }
   },
   "plugins": [
-    "react"
   ],
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
@@ -25,7 +24,5 @@ module.exports = {
     "semi": ["warn", "always"],
     "no-unused-vars": ["warn"],
     "no-console": 0,
-    "react/jsx-uses-react": "warn",
-    "react/jsx-uses-vars": "warn",
   },
 };

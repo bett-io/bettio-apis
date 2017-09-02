@@ -3,12 +3,10 @@
     [
       "env", {
         "targets": {
-          "browsers": ["last 2 versions", "> 1%"],
           "node": "6.2",
         },
         "useBuiltIns": true,
       }
     ],
-    "react",
   ]
 }

@@ -4,27 +4,6 @@ import session from 'express-session';
 
 const file = 'server/libs/session.js';
 
-const createInitialReduxState = (logger, session, user) => {
-  const state = {
-    sessionCounter: {
-      counter: session.counter,
-    },
-  };
-
-  if (session.fbToken && user) {
-    state.user = {
-      uid: user.id,
-      name: user.name,
-      pictureUrl: user.pictureUrl,
-      fbToken: session.fbToken,
-    };
-  }
-
-  logger.info({ file, function: 'createInitialReduxState', state });
-
-  return state;
-};
-
 const createSessionMiddleware = () => {
   const sessionOption = {
     resave: false,
@@ -66,7 +45,6 @@ const update = (req, data) => {
 };
 
 module.exports = {
-  createInitialReduxState,
   createSessionMiddleware,
   update,
 };

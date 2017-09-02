@@ -3,7 +3,7 @@
     "region": "us-west-2"
   },
   "dynamodb": {
-    "userTableName": "hello_user",
+    "userTableName": "user",
     "userIndexName": "fbid-index"
   }
 }
