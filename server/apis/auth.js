@@ -1,6 +1,6 @@
 import facebook from '../libs/facebook';
 import session from '../libs/session';
-import userDB from '../libs/userDB';
+import userDB from '../db/userDB';
 
 const file = 'server/apis/auth.js';
 

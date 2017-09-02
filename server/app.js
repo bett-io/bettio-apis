@@ -5,6 +5,7 @@ var path = require('path');
 
 import bodyParser from 'body-parser';
 import expressRequestId from 'express-request-id';
+import game from './apis/game';
 import logger from './libs/logger';
 import ping from './apis/ping';
 import session from './libs/session';
@@ -17,6 +18,7 @@ app.use(session.createSessionMiddleware());
 app.use(logger);
 app.use(express.static(path.join(__dirname, './public')));
 
+game(app);
 ping(app);
 
 // Export your express server so you can import it in the lambda function.
