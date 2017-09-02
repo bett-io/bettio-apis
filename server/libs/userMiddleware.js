@@ -1,4 +1,4 @@
-import userDB from './userDB';
+import userDB from '../db/userDB';
 
 const file = 'server/libs/userMiddleware.js';
 

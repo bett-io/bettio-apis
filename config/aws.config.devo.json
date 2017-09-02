@@ -4,6 +4,7 @@
   },
   "dynamodb": {
     "userTableName": "user",
-    "userIndexName": "fbid-index"
+    "userIndexName": "fbid-index",
+    "gameTableName": "game"
   }
 }

@@ -1,22 +1,8 @@
-import AWS from 'aws-sdk';
 import { awsConfig } from '../../config';
+import docClient from './docClient';
 import shortid from 'shortid';
 
-const file = 'server/libs/userDB.js';
-
-let _docClient = null;
-
-const docClient = () => {
-  if (!_docClient) {
-    AWS.config.update({
-      region: awsConfig.common.region,
-    });
-
-    _docClient = new AWS.DynamoDB.DocumentClient();
-  }
-
-  return _docClient;
-};
+const file = 'server/db/userDB.js';
 
 const createUser = (logger, fbUserInfo) => new Promise((resolve, reject) => {
   var params = {
