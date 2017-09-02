@@ -2,23 +2,25 @@ import { awsConfig } from '../../config';
 import connectDynamoDb from 'connect-dynamodb';
 import session from 'express-session';
 
-const createInitialReduxState = (session) => {
+const file = 'server/libs/session.js';
+
+const createInitialReduxState = (session, user) => {
   const state = {
     sessionCounter: {
       counter: session.counter,
     },
   };
 
-  if (session.uid && session.name && session.pictureUrl && session.fbToken) {
+  if (session.fbToken && user) {
     state.user = {
-      uid: session.uid,
-      name: session.name,
-      pictureUrl: session.pictureUrl,
+      uid: user.id,
+      name: user.name,
+      pictureUrl: user.pictureUrl,
       fbToken: session.fbToken,
     };
   }
 
-  console.log({ function: 'createInitialReduxState', state });
+  console.log({ file, function: 'createInitialReduxState', state });
 
   return state;
 };
@@ -57,15 +59,14 @@ const createSessionMiddleware = () => {
   return session(sessionOption);
 };
 
-const updateAuthResult = (req, authResponse) => {
-  req.session.uid = authResponse.uid;
-  req.session.name = authResponse.name;
-  req.session.pictureUrl = authResponse.pictureUrl;
-  req.session.fbToken = authResponse.fbToken;
+const update = (req, data) => {
+  console.log({ file, function: 'update', data });
+
+  req.session = Object.assign(req.session, data);
 };
 
 module.exports = {
   createInitialReduxState,
   createSessionMiddleware,
-  updateAuthResult,
+  update,
 };

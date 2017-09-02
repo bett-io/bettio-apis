@@ -41,19 +41,25 @@ const signin = async (req) => {
   console.log({ file, function: 'signin', user });
 
   const result = {
-    uid: fbUserInfo.id,
-    name: fbUserInfo.name,
-    pictureUrl: fbUserInfo.picture,
+    uid: user.id,
+    name: user.name,
+    pictureUrl: user.pictureUrl,
     fbToken: req.body.fbToken,
   };
 
-  session.updateAuthResult(req, result);
+  session.update(req, {
+    uid: user.id,
+    fbToken: req.body.fbToken,
+  });
 
   return result;
 };
 
 const signout = (req) => {
-  session.updateAuthResult(req, {});
+  session.update(req, {
+    uid: null,
+    fbToken: null,
+  });
 
   return {};
 };

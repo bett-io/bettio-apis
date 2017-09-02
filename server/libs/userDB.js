@@ -90,6 +90,20 @@ const findUserTable = (id) => new Promise((resolve, reject) => {
   });
 });
 
+const findUser = async (id) => {
+  try {
+    const user = await findUserTable(id);
+
+    console.log({ file, function: 'findUser', id, user });
+
+    return user;
+  } catch(err) {
+    console.error({ file, function: 'findUser', id, err });
+
+    return null;
+  }
+};
+
 const findUserByFbId = async (fbId) => {
   try {
     const fbIdUser = await findFbIdIndex(fbId);
@@ -108,14 +122,10 @@ const findUserByFbId = async (fbId) => {
   }
 };
 
-const updateUser = () => {
-
-};
-
 const userDB = {
   createUser,
+  findUser,
   findUserByFbId,
-  updateUser,
 };
 
 export default userDB;

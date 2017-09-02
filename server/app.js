@@ -13,6 +13,7 @@ import createReduxStore from '../modules/store';
 
 import auth from './apis/auth';
 import session from './libs/session';
+import userMiddleware from './libs/userMiddleware';
 
 import App from '../src/containers/App';
 
@@ -24,8 +25,8 @@ app.use(bodyParser.json()); // for parsing POST body
 app.use(session.createSessionMiddleware());
 app.use(express.static(path.join(__dirname, './public')));
 
-app.get('*', (req, res) => {
-  console.log({ function:'app.get', req: { url: req.url } });
+const handleRequest = (req, res) => {
+  console.log({ file, function: 'handleRequest', url: req.url, session: req.session, user: req.user });
 
   const context = {};
 
@@ -33,7 +34,7 @@ app.get('*', (req, res) => {
   if (!req.session.counter) req.session.counter = 0;
   req.session.counter++;
 
-  const initialState = session.createInitialReduxState(req.session);
+  const initialState = session.createInitialReduxState(req.session, req.user);
   const store = createReduxStore(initialState);
 
   const appHtml = renderToString(
@@ -51,6 +52,16 @@ app.get('*', (req, res) => {
   } else {
     res.send(renderPage(appHtml, store.getState()));
   }
+};
+
+app.get('*', (req, res) => {
+  console.log({ file, function:'get *', url: req.url, session: req.session });
+
+  // Call userMiddleware here only rather than register it by app.use().
+  // It is to reduce uncessary user db call.
+  // Once a function is registered by app.use, it is called even for asset request.
+  userMiddleware(req)
+    .then(() => handleRequest(req, res));
 });
 
 app.post('/signin', (req, res) => {
