@@ -18,7 +18,7 @@ const docClient = () => {
   return _docClient;
 };
 
-const createUser = (fbUserInfo) => new Promise((resolve, reject) => {
+const createUser = (logger, fbUserInfo) => new Promise((resolve, reject) => {
   var params = {
     TableName: awsConfig.dynamodb.userTableName,
     Item: {
@@ -31,16 +31,16 @@ const createUser = (fbUserInfo) => new Promise((resolve, reject) => {
 
   docClient().put(params, function(err, data) {
     if (err) {
-      console.error({ file, function: 'userDB.createUser', params, err });
+      logger.error({ file, function: 'userDB.createUser', params, err });
       return reject(err);
     }
 
-    console.log({ file, function: 'userDB.createUser', params, data });
+    logger.info({ file, function: 'userDB.createUser', params, data });
     return resolve(data);
   });
 });
 
-const findFbIdIndex = (fbId) => new Promise((resolve, reject) => {
+const findFbIdIndex = (logger, fbId) => new Promise((resolve, reject) => {
   const params = {
     TableName : awsConfig.dynamodb.userTableName,
     IndexName: awsConfig.dynamodb.userIndexName,
@@ -52,23 +52,23 @@ const findFbIdIndex = (fbId) => new Promise((resolve, reject) => {
 
   docClient().query(params, function(err, data) {
     if (err) {
-      console.error({ file, function: 'findFbIdIndex', params, err });
+      logger.error({ file, function: 'findFbIdIndex', params, err });
       return reject(err);
     }
 
     if (data.Count > 1) {
-      console.error({ file, function: 'findFbIdIndex',
+      logger.error({ file, function: 'findFbIdIndex',
         log: 'multiple user rows with the same fbid detected', params, data,
       });
     }
 
-    console.log({ file, function: 'findFbIdIndex', data, items: data.Items });
+    logger.info({ file, function: 'findFbIdIndex', data, items: data.Items });
 
     return resolve(data.Items[0]);
   });
 });
 
-const findUserTable = (id) => new Promise((resolve, reject) => {
+const findUserTable = (logger, id) => new Promise((resolve, reject) => {
   const params = {
     TableName: awsConfig.dynamodb.userTableName,
     Key: {
@@ -76,47 +76,47 @@ const findUserTable = (id) => new Promise((resolve, reject) => {
     },
   };
 
-  console.log({ file, function: 'findUserTable', params });
+  logger.info({ file, function: 'findUserTable', params });
 
   docClient().get(params, function(err, data) {
     if (err) {
-      console.error({ file, function: 'findUserTable', params, err });
+      logger.error({ file, function: 'findUserTable', params, err });
       return reject(err);
     }
 
-    console.log({ file, function: 'findUserTable', params, data });
+    logger.info({ file, function: 'findUserTable', params, data });
 
     return resolve(data.Item);
   });
 });
 
-const findUser = async (id) => {
+const findUser = async (logger, id) => {
   try {
     const user = await findUserTable(id);
 
-    console.log({ file, function: 'findUser', id, user });
+    logger.info({ file, function: 'findUser', id, user });
 
     return user;
   } catch(err) {
-    console.error({ file, function: 'findUser', id, err });
+    logger.error({ file, function: 'findUser', id, err });
 
     return null;
   }
 };
 
-const findUserByFbId = async (fbId) => {
+const findUserByFbId = async (logger, fbId) => {
   try {
-    const fbIdUser = await findFbIdIndex(fbId);
+    const fbIdUser = await findFbIdIndex(logger, fbId);
 
     if (!fbIdUser || !fbIdUser.id) return null;
 
-    const user = await findUserTable(fbIdUser.id);
+    const user = await findUserTable(logger, fbIdUser.id);
 
-    console.log({ file, function: 'findUserByFbId', fbId, user });
+    logger.info({ file, function: 'findUserByFbId', fbId, user });
 
     return user;
   } catch(err) {
-    console.error({ file, function: 'findUserByFbId', fbId, err });
+    logger.error({ file, function: 'findUserByFbId', fbId, err });
 
     return null;
   }

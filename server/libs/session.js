@@ -4,7 +4,7 @@ import session from 'express-session';
 
 const file = 'server/libs/session.js';
 
-const createInitialReduxState = (session, user) => {
+const createInitialReduxState = (logger, session, user) => {
   const state = {
     sessionCounter: {
       counter: session.counter,
@@ -20,7 +20,7 @@ const createInitialReduxState = (session, user) => {
     };
   }
 
-  console.log({ file, function: 'createInitialReduxState', state });
+  logger.info({ file, function: 'createInitialReduxState', state });
 
   return state;
 };
@@ -53,14 +53,14 @@ const createSessionMiddleware = () => {
 
     sessionOption.store = new DynamoDBStore(dynamoDBOptions);
   } else {
-    console.log({ function: 'getSessionOption', log: 'session will be stored in memory' });
+    console.log({ file, function: 'getSessionOption', log: 'session will be stored in memory' });
   }
 
   return session(sessionOption);
 };
 
 const update = (req, data) => {
-  console.log({ file, function: 'update', data });
+  req.log.info({ file, function: 'update', data });
 
   req.session = Object.assign(req.session, data);
 };

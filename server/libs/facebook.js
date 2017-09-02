@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const getUserInfo = async (fbToken) => {
+const getUserInfo = async (logger, fbToken) => {
   const urlMe = 'https://graph.facebook.com/me';
 
   try {
@@ -10,7 +10,7 @@ const getUserInfo = async (fbToken) => {
       },
     });
 
-    console.log({ function: 'facebook.getUserInfo', meRes: meRes.data });
+    logger.info({ function: 'facebook.getUserInfo', meRes: meRes.data });
 
     const picUrl = 'https://graph.facebook.com/' + meRes.data.id + '/picture';
     const picRes = await axios.get(picUrl, {
@@ -19,7 +19,7 @@ const getUserInfo = async (fbToken) => {
       },
     });
 
-    console.log({ function: 'facebook.getUserInfo', picRes: picRes.data });
+    logger.info({ function: 'facebook.getUserInfo', picRes: picRes.data });
 
     return {
       id: meRes.data.id,
@@ -27,7 +27,7 @@ const getUserInfo = async (fbToken) => {
       picture: picRes.data.data.url,
     };
   } catch (err) {
-    console.error({ function: 'facebook.getUserInfo', err });
+    logger.error({ function: 'facebook.getUserInfo', err });
 
     return {};
   }

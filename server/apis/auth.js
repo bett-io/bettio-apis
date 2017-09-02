@@ -4,17 +4,17 @@ import userDB from '../libs/userDB';
 
 const file = 'server/apis/auth.js';
 
-const findOrCreateUser = async (fbUserInfo) => {
+const findOrCreateUser = async (logger, fbUserInfo) => {
   try {
-    let user = await userDB.findUserByFbId(fbUserInfo.id);
+    let user = await userDB.findUserByFbId(logger, fbUserInfo.id);
 
     if (!user) {
-      user = await userDB.createUser(fbUserInfo);
+      user = await userDB.createUser(logger, fbUserInfo);
     }
 
     return user;
   } catch(err) {
-    console.log({ file, function: 'auth.findOrCreateUser', err });
+    logger.info({ file, function: 'findOrCreateUser', err });
     throw err;
   }
 };
@@ -22,23 +22,23 @@ const findOrCreateUser = async (fbUserInfo) => {
 const signin = async (req) => {
   const fbToken = req.body.fbToken;
 
-  console.log({ file, function: 'signin', fbToken });
+  req.log.info({ file, function: 'signin', fbToken });
 
   if (!fbToken) {
-    console.log({ file, function: 'signin', log: 'invalid fbToken' });
+    req.log.info({ file, function: 'signin', log: 'invalid fbToken' });
     throw new Error('invalid fbToken');
   }
 
-  const fbUserInfo = await facebook.getUserInfo(fbToken);
-  console.log({ file, function: 'signin', fbUserInfo });
+  const fbUserInfo = await facebook.getUserInfo(req.log, fbToken);
+  req.log.info({ file, function: 'signin', fbUserInfo });
 
   if (!fbUserInfo.id) {
-    console.log({ file, function: 'signin', log: 'failed to fetch user info from facebook' });
+    req.log.info({ file, function: 'signin', log: 'failed to fetch user info from facebook' });
     throw new Error('failed to fetch user information from facebook');
   }
 
-  const user = await findOrCreateUser(fbUserInfo);
-  console.log({ file, function: 'signin', user });
+  const user = await findOrCreateUser(req.log, fbUserInfo);
+  req.log.info({ file, function: 'signin', user });
 
   const result = {
     uid: user.id,

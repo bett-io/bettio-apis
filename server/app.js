@@ -4,6 +4,7 @@ var express = require('express');
 var path = require('path');
 
 import bodyParser from 'body-parser';
+import expressRequestId from 'express-request-id';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
@@ -12,6 +13,7 @@ import { Provider } from 'react-redux';
 import createReduxStore from '../modules/store';
 
 import auth from './apis/auth';
+import logger from './libs/logger';
 import session from './libs/session';
 import userMiddleware from './libs/userMiddleware';
 
@@ -21,12 +23,14 @@ const file = 'server/app.js';
 
 const app = express();
 
+app.use(expressRequestId());
 app.use(bodyParser.json()); // for parsing POST body
 app.use(session.createSessionMiddleware());
+app.use(logger);
 app.use(express.static(path.join(__dirname, './public')));
 
 const handleRequest = (req, res) => {
-  console.log({ file, function: 'handleRequest', url: req.url, session: req.session, user: req.user });
+  req.log.info({ file, function: 'handleRequest', url: req.url, session: req.session, user: req.user });
 
   const context = {};
 
@@ -34,7 +38,7 @@ const handleRequest = (req, res) => {
   if (!req.session.counter) req.session.counter = 0;
   req.session.counter++;
 
-  const initialState = session.createInitialReduxState(req.session, req.user);
+  const initialState = session.createInitialReduxState(req.log, req.session, req.user);
   const store = createReduxStore(initialState);
 
   const appHtml = renderToString(
@@ -55,7 +59,7 @@ const handleRequest = (req, res) => {
 };
 
 app.get('*', (req, res) => {
-  console.log({ file, function:'get *', url: req.url, session: req.session });
+  req.log.info({ file, function:'get *', url: req.url, session: req.session });
 
   // Call userMiddleware here only rather than register it by app.use().
   // It is to reduce uncessary user db call.
@@ -65,18 +69,18 @@ app.get('*', (req, res) => {
 });
 
 app.post('/signin', (req, res) => {
-  console.log({ file, function:'post', req: { url: req.url } });
+  req.log.info({ file, function:'post', req: { url: req.url } });
 
   auth.signin(req)
     .then((result) => res.send(result))
     .catch((error) => {
-      console.log({ file, function: 'post', error });
+      req.log.info({ file, function: 'post', error });
       res.status(403).send(error);
     });
 });
 
 app.post('/signout', (req, res) => {
-  console.log({ function:'app.post', req: { url: req.url } });
+  req.log.info({ function:'app.post', req: { url: req.url } });
 
   res.send(auth.signout(req, res));
 });

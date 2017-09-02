@@ -5,17 +5,17 @@ const file = 'server/libs/userMiddleware.js';
 export default async (req) => {
   const uid = req.session.uid;
 
-  console.log({ file, function: 'default', url: req.url, uid });
+  req.log.info({ file, function: 'default', url: req.url, uid });
 
   if (!uid) return null;
 
   try {
-    const user = await userDB.findUser(uid);
+    const user = await userDB.findUser(req.log, uid);
     req.user = user;
-    console.log({ file, function: 'default', user });
+    req.log.info({ file, function: 'default', user });
     return null;
   } catch(err) {
-    console.error({ file, function: 'default', err });
+    req.log.error({ file, function: 'default', err });
     return null;
   }
 };
