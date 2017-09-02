@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha-webpack --webpack-config webpack.test.config.js test",
     "start:standalone": "npm run build:standalone && node ./standalone/standalone.bundle.js",
-    "build": "webpack -p --config webpack.server.config.js",
+    "build": "webpack --config webpack.server.config.js",
     "build:standalone": "webpack --config webpack.standalone.config.js",
     "dist": "cp package.json ./dist/ && cd ./dist && npm install --production",
     "lint": "eslint . --cache",
